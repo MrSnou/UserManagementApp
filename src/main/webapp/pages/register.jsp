@@ -22,6 +22,10 @@
     <button type="submit">Register</button>
 </form>
 
+<% if (request.getAttribute("error") != null) { %>
+<p style="color:red"><%= request.getAttribute("error") %></p>
+<% } %>
+
 <h2>Or add random TEST users</h2>
 <form action="<%= request.getContextPath() %>/addRandomUsers" method="post">
     <input type="number" name="count" value="3" min="1" />
