@@ -27,6 +27,12 @@
         <td><%=u.getId()%></td>
         <td><%=u.getUserName()%></td>
         <td><%=u.getEmail()%></td>
+        <td>
+            <a href="<%= request.getContextPath() %>/delete?id=<%=u.getId()%>">Delete</a>
+        </td>
+        <td>
+            <a href="<%= request.getContextPath() %>/userEdit?id=<%=u.getId()%>">Edit</a>
+        </td>
     </tr>
     <%
             }

@@ -12,13 +12,20 @@
 </head>
 <body>
 <p><a href="<%= request.getContextPath() %>/">Back to Home</a></p>
-<p><a href="<%= request.getContextPath() %>users">Go to Users list</a></p>
+<p><a href="<%= request.getContextPath() %>/users">Go to Users list</a></p>
+
 <h2>Register</h2>
-<form action="/register" method='post'>
-   <input type="text" name="username" placeholder="Username">
+<form action="<%= request.getContextPath() %>/register" method="post">
+    <input type="text" name="username" placeholder="Username">
     <input type="password" name="password" placeholder="Password">
     <input type="email" name="email" placeholder="Email Address">
     <button type="submit">Register</button>
+</form>
+
+<h2>Or add random TEST users</h2>
+<form action="<%= request.getContextPath() %>/addRandomUsers" method="post">
+    <input type="number" name="count" value="3" min="1" />
+    <button type="submit">Dodaj losowych użytkowników</button>
 </form>
 </body>
 </html>
