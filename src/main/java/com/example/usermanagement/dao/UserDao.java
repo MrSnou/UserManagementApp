@@ -1,48 +1,114 @@
 package com.example.usermanagement.dao;
 
+import com.example.usermanagement.dbutil.DatabaseConnection;
 import com.example.usermanagement.model.User;
 
+import javax.xml.crypto.Data;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 public class UserDao {
-    private static List<User> users = new ArrayList<>();
+//    private static List<User> users = new ArrayList<>();
     private static int idCounter = 1;
 
 
     public void addUser(User user) {
-        user.setId(idCounter++);
-        users.add(user);
+//        user.setId(idCounter++);
+//        users.add(user);
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            PreparedStatement stmt = conn.prepareStatement(
+                    "Insert Into users (username, email, password) Values (?, ?, ?)"
+            );
+            stmt.setString(1, user.getUserName());
+            stmt.setString(2, user.getEmail());
+            stmt.setString(3, user.getPassword());
+            stmt.executeUpdate();
+            stmt.close();
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
     }
 
     public List<User> getUsers() {
+        List<User> users = new ArrayList<>();
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("Select * from users");
+            while (rs.next()) {
+                User user = new User();
+                user.setId(rs.getInt("id"));
+                user.setUserName(rs.getString("username"));
+                user.setEmail(rs.getString("email"));
+                user.setPassword(rs.getString("password"));
+                users.add(user);
+            }
+            stmt.close();
+        }catch (SQLException ex) {
+            ex.printStackTrace();
+        }
         return users;
     }
 
     public User getUserByUsername(String username) {
-        for (User user : users) {
-            if (user.getUserName().equals(username)) {
-                return user;
-            }
+
+        try (Connection c = DatabaseConnection.getConnection()) {
+            PreparedStatement ps = c.prepareStatement("Select * from users where username = '" + username + "'");
+            ps.setString(1, username);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                User resultUser = new User();
+                resultUser.setId(rs.getInt("id"));
+                resultUser.setUserName(rs.getString("username"));
+                resultUser.setEmail(rs.getString("email"));
+                resultUser.setPassword(rs.getString("password"));
+                return resultUser;
+            } else return null;
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
         }
         return null;
     }
 
     public User getUserById(int id) {
-        for (User user : users) {
-            if (user.getId() == id) {
-                return user;
-            }
+        try (Connection c = DatabaseConnection.getConnection()) {
+            PreparedStatement ps = c.prepareStatement("Select * from users where id = " + id);
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                User resultUser = new User();
+                resultUser.setId(rs.getInt("id"));
+                resultUser.setUserName(rs.getString("username"));
+                resultUser.setEmail(rs.getString("email"));
+                resultUser.setPassword(rs.getString("password"));
+                return resultUser;
+            } else return null;
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
         }
         return null;
     }
 
     public void deleteUser(int id) {
-        users.removeIf(u -> u.getId() == id);
+        try (Connection c = DatabaseConnection.getConnection()) {
+            PreparedStatement ps = c.prepareStatement("delete from users where id = " + id);
+            ps.setInt(1, id);
+            ps.executeUpdate();
+            ps.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
     }
 
     public void addRandomUsers(int numberOfUsers) {
@@ -52,24 +118,27 @@ public class UserDao {
 
         for (int i = 0; i < numberOfUsers; i++) {
             User u = new User();
-            u.setId(idCounter++);
             String name = names[random.nextInt(names.length)] + i;
             u.setUserName(name);
             u.setPassword("pass" + i);
             u.setEmail(name.toLowerCase() + "@" + domains[random.nextInt(domains.length)]);
-            users.add(u);
+            addUser(u);
         }
     }
 
     public void editUser(int id, String userName, String password, String email) {
-        for (User user : users) {
-            if (user.getId() == id) {
-                user.setUserName(userName);
-                user.setPassword(password);
-                user.setEmail(email);
-                break;
-            }
+        try (Connection c = DatabaseConnection.getConnection()) {
+            PreparedStatement ps = c.prepareStatement("UPDATE users Set username = ? , password = ? , email = ? where id = ?");
+            ps.setString(1, userName);
+            ps.setString(2, passwordHashing(password));
+            ps.setString(3, email);
+            ps.setInt(4, id);
+            ps.executeUpdate();
+            ps.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
         }
+
     }
     public String passwordHashing(String password) {
         try {
