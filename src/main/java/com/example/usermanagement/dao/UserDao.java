@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 
 public class UserDao {
 //    private static List<User> users = new ArrayList<>();
-    private static int idCounter = 1;
+//    private static int idCounter = 1;
 
 
     public void addUser(User user) {
@@ -28,7 +28,7 @@ public class UserDao {
             );
             stmt.setString(1, user.getUserName());
             stmt.setString(2, user.getEmail());
-            stmt.setString(3, user.getPassword());
+            stmt.setString(3, passwordHashing(user.getPassword()));
             stmt.executeUpdate();
             stmt.close();
 
@@ -43,13 +43,9 @@ public class UserDao {
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery("Select * from users");
             while (rs.next()) {
-                User user = new User();
-                user.setId(rs.getInt("id"));
-                user.setUserName(rs.getString("username"));
-                user.setEmail(rs.getString("email"));
-                user.setPassword(rs.getString("password"));
-                users.add(user);
+                users.add(mapRow(rs));
             }
+            rs.close();
             stmt.close();
         }catch (SQLException ex) {
             ex.printStackTrace();
@@ -60,18 +56,14 @@ public class UserDao {
     public User getUserByUsername(String username) {
 
         try (Connection c = DatabaseConnection.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("Select * from users where username = '" + username + "'");
+            PreparedStatement ps = c.prepareStatement("SELECT * FROM users WHERE username = ?");
             ps.setString(1, username);
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                User resultUser = new User();
-                resultUser.setId(rs.getInt("id"));
-                resultUser.setUserName(rs.getString("username"));
-                resultUser.setEmail(rs.getString("email"));
-                resultUser.setPassword(rs.getString("password"));
-                return resultUser;
+                return mapRow(rs);
             } else return null;
+
 
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -80,20 +72,15 @@ public class UserDao {
     }
 
     public User getUserById(int id) {
-        try (Connection c = DatabaseConnection.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("Select * from users where id = " + id);
+        String sql = "SELECT * FROM users WHERE id = ?";
+        try (Connection c = DatabaseConnection.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, id);
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                User resultUser = new User();
-                resultUser.setId(rs.getInt("id"));
-                resultUser.setUserName(rs.getString("username"));
-                resultUser.setEmail(rs.getString("email"));
-                resultUser.setPassword(rs.getString("password"));
-                return resultUser;
-            } else return null;
-
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapRow(rs);
+                }
+            }
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
@@ -101,11 +88,11 @@ public class UserDao {
     }
 
     public void deleteUser(int id) {
-        try (Connection c = DatabaseConnection.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("delete from users where id = " + id);
+        String sql = "DELETE FROM users WHERE id = ?";
+        try (Connection c = DatabaseConnection.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, id);
             ps.executeUpdate();
-            ps.close();
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
@@ -153,5 +140,14 @@ public class UserDao {
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException("Error hashing password", e);
         }
+    }
+
+    private User mapRow(ResultSet rs) throws SQLException {
+        User u = new User();
+        u.setId(rs.getInt("id"));
+        u.setUserName(rs.getString("username"));
+        u.setEmail(rs.getString("email"));
+        u.setPassword(rs.getString("password"));
+        return u;
     }
 }
