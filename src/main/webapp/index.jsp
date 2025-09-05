@@ -8,5 +8,6 @@
 <p><a href="hello">Go to HelloServlet</a></p>
 <p><a href="pages/register.jsp">Register new user</a></p>
 <p><a href="users">Show all users</a></p>
+<p><a href="/pages/login.jsp">Login</a></p>
 </body>
 </html>

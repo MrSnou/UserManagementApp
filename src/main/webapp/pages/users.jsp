@@ -15,6 +15,7 @@
 <body>
 <p><a href="<%= request.getContextPath() %>/">Back to Home</a></p>
 <p><a href="<%= request.getContextPath() %>/pages/register.jsp">Register new user</a></p>
+<p><a href="<%= request.getContextPath() %>/pages/login.jsp">Login</a></p>
 <h2>Registered Users</h2>
 <table border="1">
     <tr><th> ID </th><th> Username </th><th> Email </th></tr>

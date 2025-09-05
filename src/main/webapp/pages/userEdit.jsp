@@ -9,6 +9,7 @@
 <html>
 <p><a href="<%= request.getContextPath() %>/">Back to Home</a></p>
 <p><a href="<%= request.getContextPath() %>/users">Go to Users list</a></p>
+<p><a href="<%= request.getContextPath() %>/pages/login.jsp">Login</a></p>
 
 <h2>Edit user</h2>
 <form action="<%= request.getContextPath() %>/userEdit" method="post">
