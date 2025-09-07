@@ -15,6 +15,11 @@ import java.io.IOException;
 public class RegisterServlet extends HttpServlet {
     private UserDao userDao = new UserDao();
 
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        req.getRequestDispatcher("/pages/register.jsp").forward(req, resp);
+    }
+
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String username = req.getParameter("username");
         String password = req.getParameter("password");

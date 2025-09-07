@@ -15,13 +15,10 @@ import java.util.logging.Logger;
 
 
 public class UserDao {
-//    private static List<User> users = new ArrayList<>();
-//    private static int idCounter = 1;
+
 
 
     public void addUser(User user) {
-//        user.setId(idCounter++);
-//        users.add(user);
         try (Connection conn = DatabaseConnection.getConnection()) {
             PreparedStatement stmt = conn.prepareStatement(
                     "Insert Into users (username, email, password) Values (?, ?, ?)"

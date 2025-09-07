@@ -14,12 +14,18 @@ import java.io.IOException;
 public class LoginServlet extends HttpServlet {
     private UserDao userDao = new UserDao();
 
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        req.getRequestDispatcher("/pages/login.jsp").forward(req, resp);
+    }
+
+    @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String username = req.getParameter("username");
         String password = req.getParameter("password").trim();
 
 
-        if  (username == null || password == null || username.isEmpty() || password.isEmpty()) {
+        if  (username == null || password == null || username.trim().isEmpty() || password.trim().isEmpty()) {
             req.setAttribute("error", "Write correct username and password.");
             req.getRequestDispatcher("/pages/login.jsp").forward(req, resp);
             return;
@@ -35,12 +41,10 @@ public class LoginServlet extends HttpServlet {
             String hashedPassword = userDao.passwordHashing(password).trim();
             if (hashedPassword.equals(user.getPassword())) {
                 req.getSession().setAttribute("user", user);
-                resp.sendRedirect(req.getContextPath() + "/home");
+                resp.sendRedirect(req.getContextPath() + "/pages/home.jsp");
             } else {
                 req.setAttribute("error", "Wrong password.");
                 req.getRequestDispatcher("/pages/login.jsp").forward(req, resp);
-                System.out.println("DB password=" + user.getPassword());
-                System.out.println("Entered password hash=" + hashedPassword);
             }
 
         } catch (Exception ex) {

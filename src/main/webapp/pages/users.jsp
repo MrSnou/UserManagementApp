@@ -8,14 +8,15 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.List" %>
 <%@ page import="com.example.usermanagement.model.User" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <html>
 <head>
     <title>Users</title>
 </head>
 <body>
-<p><a href="<%= request.getContextPath() %>/">Back to Home</a></p>
-<p><a href="<%= request.getContextPath() %>/pages/register.jsp">Register new user</a></p>
-<p><a href="<%= request.getContextPath() %>/pages/login.jsp">Login</a></p>
+<p><a href="<c:url value='/'/>">Back to Home</a></p>
+<a href="<c:url value='/register'/>">Register new user</a>
+<p><a href="<c:url value='/login'/>">Login</a></p>
 <h2>Registered Users</h2>
 <table border="1">
     <tr><th> ID </th><th> Username </th><th> Email </th></tr>
