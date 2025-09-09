@@ -23,7 +23,7 @@
 <p><a href="<c:url value='/'/>">Back to Home</a></p>
 <p><a href="<c:url value='/users'/>">Show all users</a></p>
 
-<h1>Welcome, <%= user.getUserName() %>!</h1>
+<h1>Welcome, <%= user.getUsername() %>!</h1>
 
 <p>Email: <%= user.getEmail() %></p>
 

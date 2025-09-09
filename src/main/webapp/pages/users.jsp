@@ -27,7 +27,7 @@
     %>
     <tr>
         <td><%=u.getId()%></td>
-        <td><%=u.getUserName()%></td>
+        <td><%=u.getUsername()%></td>
         <td><%=u.getEmail()%></td>
         <td>
             <a href="<%= request.getContextPath() %>/delete?id=<%=u.getId()%>">Delete</a>

@@ -41,7 +41,7 @@ public class RegisterServlet extends HttpServlet {
         boolean emailExist = false;
 
         for (User u : userDao.getUsers()) {
-            if (u.getUserName().equals(username)) {
+            if (u.getUsername().equals(username)) {
                 usernameExist = true;
                 break;
             }
@@ -65,7 +65,7 @@ public class RegisterServlet extends HttpServlet {
 
 
         User user = new User();
-        user.setUserName(username);
+        user.setUsername(username);
 
         user.setPassword(password);
         user.setEmail(email);

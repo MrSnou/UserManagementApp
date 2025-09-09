@@ -1,18 +1,26 @@
 package com.example.usermanagement.model;
 
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "users")
+
 public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private String userName;
+    @Column(nullable = false, unique = true)
+    private String username;
+    @Column(nullable = false)
     private String password;
+    @Column(nullable = false)
     private String email;
 
-    public User() {
+    public User() {}
 
-    }
-
-    public User(int id, String userName, String password, String email) {
+    public User(int id, String username, String password, String email) {
         this.id = id;
-        this.userName = userName;
+        this.username = username;
         this.password = password;
         this.email = email;
     }
@@ -23,11 +31,11 @@ public class User {
     public void setId(int id) {
         this.id = id;
     }
-    public String getUserName() {
-        return userName;
+    public String getUsername() {
+        return username;
     }
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setUsername(String userName) {
+        this.username = userName;
     }
     public String getPassword() {
         return password;

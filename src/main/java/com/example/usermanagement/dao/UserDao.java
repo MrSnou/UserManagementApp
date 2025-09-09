@@ -1,17 +1,15 @@
 package com.example.usermanagement.dao;
 
-import com.example.usermanagement.dbutil.DatabaseConnection;
+import com.example.usermanagement.dbutil.HibernateUtil;
 import com.example.usermanagement.model.User;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 
-import javax.xml.crypto.Data;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
 public class UserDao {
@@ -19,80 +17,129 @@ public class UserDao {
 
 
     public void addUser(User user) {
-        try (Connection conn = DatabaseConnection.getConnection()) {
-            PreparedStatement stmt = conn.prepareStatement(
-                    "Insert Into users (username, email, password) Values (?, ?, ?)"
-            );
-            stmt.setString(1, user.getUserName());
-            stmt.setString(2, user.getEmail());
-            stmt.setString(3, passwordHashing(user.getPassword()));
-            stmt.executeUpdate();
-            stmt.close();
-
-        } catch (SQLException ex) {
-            ex.printStackTrace();
+        Transaction tx = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            tx = session.beginTransaction();
+            user.setPassword(passwordHashing(user.getPassword()));
+            session.persist(user);
+            tx.commit();
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            e.printStackTrace();
         }
+
+/**        Old SQLdb code **/
+//        try (Connection conn = DatabaseConnection.getConnection()) {
+//            PreparedStatement stmt = conn.prepareStatement(
+//                    "Insert Into users (username, email, password) Values (?, ?, ?)"
+//            );
+//            stmt.setString(1, user.getUserName());
+//            stmt.setString(2, user.getEmail());
+//            stmt.setString(3, passwordHashing(user.getPassword()));
+//            stmt.executeUpdate();
+//            stmt.close();
+//
+//        } catch (SQLException ex) {
+//            ex.printStackTrace();
+//        }
     }
 
     public List<User> getUsers() {
-        List<User> users = new ArrayList<>();
-        try (Connection conn = DatabaseConnection.getConnection()) {
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery("Select * from users");
-            while (rs.next()) {
-                users.add(mapRow(rs));
-            }
-            rs.close();
-            stmt.close();
-        }catch (SQLException ex) {
-            ex.printStackTrace();
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.createQuery("FROM User", User.class).list();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>();
         }
-        return users;
+        /** Old SQLdb Code **/
+//        List<User> users = new ArrayList<>();
+//        try (Connection conn = DatabaseConnection.getConnection()) {
+//            Statement stmt = conn.createStatement();
+//            ResultSet rs = stmt.executeQuery("Select * from users");
+//            while (rs.next()) {
+//                users.add(mapRow(rs));
+//            }
+//            rs.close();
+//            stmt.close();
+//        }catch (SQLException ex) {
+//            ex.printStackTrace();
+//        }
+//        return users;
     }
 
     public User getUserByUsername(String username) {
-
-        try (Connection c = DatabaseConnection.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("SELECT * FROM users WHERE username = ?");
-            ps.setString(1, username);
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                return mapRow(rs);
-            } else return null;
-
-
-        } catch (SQLException ex) {
-            ex.printStackTrace();
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.createQuery("FROM User WHERE username = :username", User.class)
+                    .setParameter("username", username)
+                    .uniqueResult();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
+        /** Old SQLdb Code **/
+//        try (Connection c = DatabaseConnection.getConnection()) {
+//            PreparedStatement ps = c.prepareStatement("SELECT * FROM users WHERE username = ?");
+//            ps.setString(1, username);
+//            ResultSet rs = ps.executeQuery();
+//
+//            if (rs.next()) {
+//                return mapRow(rs);
+//            } else return null;
+//
+//
+//        } catch (SQLException ex) {
+//            ex.printStackTrace();
+//        }
         return null;
     }
 
     public User getUserById(int id) {
-        String sql = "SELECT * FROM users WHERE id = ?";
-        try (Connection c = DatabaseConnection.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setInt(1, id);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return mapRow(rs);
-                }
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.get(User.class, id);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
-        return null;
+
+        /** Old SQLdb Code **/
+//        String sql = "SELECT * FROM users WHERE id = ?";
+//        try (Connection c = DatabaseConnection.getConnection();
+//             PreparedStatement ps = c.prepareStatement(sql)) {
+//            ps.setInt(1, id);
+//            try (ResultSet rs = ps.executeQuery()) {
+//                if (rs.next()) {
+//                    return mapRow(rs);
+//                }
+//            }
+//        } catch (SQLException ex) {
+//            ex.printStackTrace();
+//        }
+//        return null;
     }
 
     public void deleteUser(int id) {
-        String sql = "DELETE FROM users WHERE id = ?";
-        try (Connection c = DatabaseConnection.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setInt(1, id);
-            ps.executeUpdate();
-        } catch (SQLException ex) {
-            ex.printStackTrace();
+        Transaction tx = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            tx = session.beginTransaction();
+            User user = session.get(User.class, id);
+            if (user != null) {
+                session.remove(user);
+            }
+            tx.commit();
+        }  catch (Exception e) {
+            if (tx != null) tx.rollback();
+            e.printStackTrace();
         }
+
+        /** Old SQLdb Code **/
+//        String sql = "DELETE FROM users WHERE id = ?";
+//        try (Connection c = DatabaseConnection.getConnection();
+//             PreparedStatement ps = c.prepareStatement(sql)) {
+//            ps.setInt(1, id);
+//            ps.executeUpdate();
+//        } catch (SQLException ex) {
+//            ex.printStackTrace();
+//        }
     }
 
     public void addRandomUsers(int numberOfUsers) {
@@ -103,7 +150,7 @@ public class UserDao {
         for (int i = 0; i < numberOfUsers; i++) {
             User u = new User();
             String name = names[random.nextInt(names.length)] + i;
-            u.setUserName(name);
+            u.setUsername(name);
             u.setPassword("pass" + i);
             u.setEmail(name.toLowerCase() + "@" + domains[random.nextInt(domains.length)]);
             addUser(u);
@@ -111,17 +158,34 @@ public class UserDao {
     }
 
     public void editUser(int id, String userName, String password, String email) {
-        try (Connection c = DatabaseConnection.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("UPDATE users Set username = ? , password = ? , email = ? where id = ?");
-            ps.setString(1, userName);
-            ps.setString(2, passwordHashing(password));
-            ps.setString(3, email);
-            ps.setInt(4, id);
-            ps.executeUpdate();
-            ps.close();
-        } catch (SQLException ex) {
-            ex.printStackTrace();
+        Transaction tx = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            tx = session.beginTransaction();
+            User user = session.get(User.class, id);
+            if (user != null) {
+                user.setUsername(userName);
+                user.setPassword(passwordHashing(password));
+                user.setEmail(email);
+                session.update(user);
+            }
+            tx.commit();
+        }  catch (Exception e) {
+            if (tx != null) tx.rollback();
+            e.printStackTrace();
         }
+
+        /** Old SQLdb Code **/
+//        try (Connection c = DatabaseConnection.getConnection()) {
+//            PreparedStatement ps = c.prepareStatement("UPDATE users Set username = ? , password = ? , email = ? where id = ?");
+//            ps.setString(1, userName);
+//            ps.setString(2, passwordHashing(password));
+//            ps.setString(3, email);
+//            ps.setInt(4, id);
+//            ps.executeUpdate();
+//            ps.close();
+//        } catch (SQLException ex) {
+//            ex.printStackTrace();
+//        }
 
     }
     public String passwordHashing(String password) {
@@ -139,12 +203,13 @@ public class UserDao {
         }
     }
 
-    private User mapRow(ResultSet rs) throws SQLException {
-        User u = new User();
-        u.setId(rs.getInt("id"));
-        u.setUserName(rs.getString("username"));
-        u.setEmail(rs.getString("email"));
-        u.setPassword(rs.getString("password"));
-        return u;
-    }
+/** Old SQLdb method **/
+//    private User mapRow(ResultSet rs) throws SQLException {
+//        User u = new User();
+//        u.setId(rs.getInt("id"));
+//        u.setUserName(rs.getString("username"));
+//        u.setEmail(rs.getString("email"));
+//        u.setPassword(rs.getString("password"));
+//        return u;
+//    }
 }
