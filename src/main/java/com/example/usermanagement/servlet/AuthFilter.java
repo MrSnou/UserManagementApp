@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-@WebFilter({"/secure/*", "/delete", "/userEdit"})  // chronimy wszystkie adresy zaczynające się od /secure/
+@WebFilter({"/secure/*", "/delete", "/userEdit"})
 public class AuthFilter implements Filter {
 
     @Override
@@ -17,14 +17,11 @@ public class AuthFilter implements Filter {
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse resp = (HttpServletResponse) response;
 
-        // Sprawdź czy w sesji jest użytkownik
         Object user = req.getSession().getAttribute("user");
 
         if (user == null) {
-            // brak zalogowanego użytkownika → przekierowanie do logowania
             resp.sendRedirect(req.getContextPath() + "/pages/login.jsp");
         } else {
-            // zalogowany → przepuszczamy dalej
             chain.doFilter(request, response);
         }
     }

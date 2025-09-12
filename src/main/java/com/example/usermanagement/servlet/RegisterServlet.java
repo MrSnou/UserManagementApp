@@ -1,6 +1,8 @@
 package com.example.usermanagement.servlet;
 
+import com.example.usermanagement.dao.RoleDao;
 import com.example.usermanagement.dao.UserDao;
+import com.example.usermanagement.model.Role;
 import com.example.usermanagement.model.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -14,6 +16,7 @@ import java.io.IOException;
 @WebServlet("/register")
 public class RegisterServlet extends HttpServlet {
     private UserDao userDao = new UserDao();
+    private RoleDao roleDao = new RoleDao();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -69,6 +72,12 @@ public class RegisterServlet extends HttpServlet {
 
         user.setPassword(password);
         user.setEmail(email);
+
+        Role userRole = roleDao.getRoleByName("ROLE_USER");
+        if (userRole == null) {
+            throw new RuntimeException("Default role ROLE_USER not found in database!");
+        }
+        user.setRole(userRole);
 
         userDao.addUser(user);
 

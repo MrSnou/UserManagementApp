@@ -19,7 +19,7 @@
 <p><a href="<c:url value='/login'/>">Login</a></p>
 <h2>Registered Users</h2>
 <table border="1">
-    <tr><th> ID </th><th> Username </th><th> Email </th></tr>
+    <tr><th> ID </th><th> Username </th><th> Email </th><th> Role </th></tr>
     <%
         List<User> users = (List<User>) request.getAttribute("users");
         if (users != null) {
@@ -29,6 +29,7 @@
         <td><%=u.getId()%></td>
         <td><%=u.getUsername()%></td>
         <td><%=u.getEmail()%></td>
+        <td><%=u.getRole()%></td>
         <td>
             <a href="<%= request.getContextPath() %>/delete?id=<%=u.getId()%>">Delete</a>
         </td>

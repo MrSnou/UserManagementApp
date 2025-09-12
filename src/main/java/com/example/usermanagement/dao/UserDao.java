@@ -1,6 +1,7 @@
 package com.example.usermanagement.dao;
 
 import com.example.usermanagement.dbutil.HibernateUtil;
+import com.example.usermanagement.model.Role;
 import com.example.usermanagement.model.User;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -14,8 +15,6 @@ import java.util.Random;
 
 public class UserDao {
 
-
-
     public void addUser(User user) {
         Transaction tx = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
@@ -27,21 +26,6 @@ public class UserDao {
             if (tx != null) tx.rollback();
             e.printStackTrace();
         }
-
-/**        Old SQLdb code **/
-//        try (Connection conn = DatabaseConnection.getConnection()) {
-//            PreparedStatement stmt = conn.prepareStatement(
-//                    "Insert Into users (username, email, password) Values (?, ?, ?)"
-//            );
-//            stmt.setString(1, user.getUserName());
-//            stmt.setString(2, user.getEmail());
-//            stmt.setString(3, passwordHashing(user.getPassword()));
-//            stmt.executeUpdate();
-//            stmt.close();
-//
-//        } catch (SQLException ex) {
-//            ex.printStackTrace();
-//        }
     }
 
     public List<User> getUsers() {
@@ -51,20 +35,6 @@ public class UserDao {
             e.printStackTrace();
             return new ArrayList<>();
         }
-        /** Old SQLdb Code **/
-//        List<User> users = new ArrayList<>();
-//        try (Connection conn = DatabaseConnection.getConnection()) {
-//            Statement stmt = conn.createStatement();
-//            ResultSet rs = stmt.executeQuery("Select * from users");
-//            while (rs.next()) {
-//                users.add(mapRow(rs));
-//            }
-//            rs.close();
-//            stmt.close();
-//        }catch (SQLException ex) {
-//            ex.printStackTrace();
-//        }
-//        return users;
     }
 
     public User getUserByUsername(String username) {
@@ -75,21 +45,6 @@ public class UserDao {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        /** Old SQLdb Code **/
-//        try (Connection c = DatabaseConnection.getConnection()) {
-//            PreparedStatement ps = c.prepareStatement("SELECT * FROM users WHERE username = ?");
-//            ps.setString(1, username);
-//            ResultSet rs = ps.executeQuery();
-//
-//            if (rs.next()) {
-//                return mapRow(rs);
-//            } else return null;
-//
-//
-//        } catch (SQLException ex) {
-//            ex.printStackTrace();
-//        }
         return null;
     }
 
@@ -100,21 +55,6 @@ public class UserDao {
             e.printStackTrace();
             return null;
         }
-
-        /** Old SQLdb Code **/
-//        String sql = "SELECT * FROM users WHERE id = ?";
-//        try (Connection c = DatabaseConnection.getConnection();
-//             PreparedStatement ps = c.prepareStatement(sql)) {
-//            ps.setInt(1, id);
-//            try (ResultSet rs = ps.executeQuery()) {
-//                if (rs.next()) {
-//                    return mapRow(rs);
-//                }
-//            }
-//        } catch (SQLException ex) {
-//            ex.printStackTrace();
-//        }
-//        return null;
     }
 
     public void deleteUser(int id) {
@@ -130,16 +70,6 @@ public class UserDao {
             if (tx != null) tx.rollback();
             e.printStackTrace();
         }
-
-        /** Old SQLdb Code **/
-//        String sql = "DELETE FROM users WHERE id = ?";
-//        try (Connection c = DatabaseConnection.getConnection();
-//             PreparedStatement ps = c.prepareStatement(sql)) {
-//            ps.setInt(1, id);
-//            ps.executeUpdate();
-//        } catch (SQLException ex) {
-//            ex.printStackTrace();
-//        }
     }
 
     public void addRandomUsers(int numberOfUsers) {
@@ -153,6 +83,13 @@ public class UserDao {
             u.setUsername(name);
             u.setPassword("pass" + i);
             u.setEmail(name.toLowerCase() + "@" + domains[random.nextInt(domains.length)]);
+            try {
+                RoleDao roleDao = new RoleDao();
+                Role userRole = roleDao.getRoleByName("ROLE_USER");
+                u.setRole(userRole);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             addUser(u);
         }
     }
@@ -174,20 +111,8 @@ public class UserDao {
             e.printStackTrace();
         }
 
-        /** Old SQLdb Code **/
-//        try (Connection c = DatabaseConnection.getConnection()) {
-//            PreparedStatement ps = c.prepareStatement("UPDATE users Set username = ? , password = ? , email = ? where id = ?");
-//            ps.setString(1, userName);
-//            ps.setString(2, passwordHashing(password));
-//            ps.setString(3, email);
-//            ps.setInt(4, id);
-//            ps.executeUpdate();
-//            ps.close();
-//        } catch (SQLException ex) {
-//            ex.printStackTrace();
-//        }
-
     }
+
     public String passwordHashing(String password) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
@@ -202,14 +127,119 @@ public class UserDao {
             throw new RuntimeException("Error hashing password", e);
         }
     }
-
-/** Old SQLdb method **/
-//    private User mapRow(ResultSet rs) throws SQLException {
-//        User u = new User();
-//        u.setId(rs.getInt("id"));
-//        u.setUserName(rs.getString("username"));
-//        u.setEmail(rs.getString("email"));
-//        u.setPassword(rs.getString("password"));
-//        return u;
-//    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/** Legacy Code (SQL RAM db)
+ *          Row reader from SQL db just to ez things out.
+ * //    private User mapRow(ResultSet rs) throws SQLException {
+ * //        User u = new User();
+ * //        u.setId(rs.getInt("id"));
+ * //        u.setUserName(rs.getString("username"));
+ * //        u.setEmail(rs.getString("email"));
+ * //        u.setPassword(rs.getString("password"));
+ * //        return u;
+ * //    }
+ *
+ *          Edit User
+ * //        try (Connection c = DatabaseConnection.getConnection()) {
+ * //            PreparedStatement ps = c.prepareStatement("UPDATE users Set username = ? , password = ? , email = ? where id = ?");
+ * //            ps.setString(1, userName);
+ * //            ps.setString(2, passwordHashing(password));
+ * //            ps.setString(3, email);
+ * //            ps.setInt(4, id);
+ * //            ps.executeUpdate();
+ * //            ps.close();
+ * //        } catch (SQLException ex) {
+ * //            ex.printStackTrace();
+ * //        }
+ *
+ *          Delete User
+ * //        String sql = "DELETE FROM users WHERE id = ?";
+ * //        try (Connection c = DatabaseConnection.getConnection();
+ * //             PreparedStatement ps = c.prepareStatement(sql)) {
+ * //            ps.setInt(1, id);
+ * //            ps.executeUpdate();
+ * //        } catch (SQLException ex) {
+ * //            ex.printStackTrace();
+ * //        }
+ *
+ *          Get User by ID
+ * //        String sql = "SELECT * FROM users WHERE id = ?";
+ * //        try (Connection c = DatabaseConnection.getConnection();
+ * //             PreparedStatement ps = c.prepareStatement(sql)) {
+ * //            ps.setInt(1, id);
+ * //            try (ResultSet rs = ps.executeQuery()) {
+ * //                if (rs.next()) {
+ * //                    return mapRow(rs);
+ * //                }
+ * //            }
+ * //        } catch (SQLException ex) {
+ * //            ex.printStackTrace();
+ * //        }
+ * //        return null;
+ *
+ *          Get User by Username
+ * //        try (Connection c = DatabaseConnection.getConnection()) {
+ * //            PreparedStatement ps = c.prepareStatement("SELECT * FROM users WHERE username = ?");
+ * //            ps.setString(1, username);
+ * //            ResultSet rs = ps.executeQuery();
+ * //
+ * //            if (rs.next()) {
+ * //                return mapRow(rs);
+ * //            } else return null;
+ * //
+ * //
+ * //        } catch (SQLException ex) {
+ * //            ex.printStackTrace();
+ * //        }
+ *
+ *          Get Users
+ * //        List<User> users = new ArrayList<>();
+ * //        try (Connection conn = DatabaseConnection.getConnection()) {
+ * //            Statement stmt = conn.createStatement();
+ * //            ResultSet rs = stmt.executeQuery("Select * from users");
+ * //            while (rs.next()) {
+ * //                users.add(mapRow(rs));
+ * //            }
+ * //            rs.close();
+ * //            stmt.close();
+ * //        }catch (SQLException ex) {
+ * //            ex.printStackTrace();
+ * //        }
+ * //        return users;
+ *
+ *          Add User
+ * //        try (Connection conn = DatabaseConnection.getConnection()) {
+ * //            PreparedStatement stmt = conn.prepareStatement(
+ * //                    "Insert Into users (username, email, password) Values (?, ?, ?)"
+ * //            );
+ * //            stmt.setString(1, user.getUserName());
+ * //            stmt.setString(2, user.getEmail());
+ * //            stmt.setString(3, passwordHashing(user.getPassword()));
+ * //            stmt.executeUpdate();
+ * //            stmt.close();
+ * //
+ * //        } catch (SQLException ex) {
+ * //            ex.printStackTrace();
+ * //        }
+ */

@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class DatabaseConnection {
+                            /** Legacy Code **/
     /** Whole code refactored to Hibernate, no need for handwriting in SQL **/
 //    private static final String URL = "jdbc:h2:C:/Users/jakub/IdeaProjects/UserManagementApp/testdb;AUTO_SERVER=TRUE";
 //    private static final String USER = "sa";

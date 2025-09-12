@@ -21,10 +21,8 @@ public class LoggedInRedirectFilter implements Filter {
         Object user = req.getSession().getAttribute("user");
 
         if (user != null) {
-            // jeśli już zalogowany → przekierowanie na stronę domową
             resp.sendRedirect(req.getContextPath() + "/pages/home.jsp");
         } else {
-            // jeśli nie zalogowany → normalnie obsługuj dalej (servlet/jsp)
             chain.doFilter(request, response);
         }
     }
