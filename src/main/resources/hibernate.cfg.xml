@@ -14,5 +14,6 @@
         <property name="hibernate.show_sql">true</property>
         <mapping class="com.example.usermanagement.model.User"/>
         <mapping class="com.example.usermanagement.model.Role"/>
+        <mapping class="com.example.usermanagement.model.Permission"/>
     </session-factory>
 </hibernate-configuration>

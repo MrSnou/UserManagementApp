@@ -31,10 +31,24 @@
         <td><%=u.getEmail()%></td>
         <td><%=u.getRole()%></td>
         <td>
-            <a href="<%= request.getContextPath() %>/delete?id=<%=u.getId()%>">Delete</a>
-        </td>
-        <td>
-            <a href="<%= request.getContextPath() %>/userEdit?id=<%=u.getId()%>">Edit</a>
+            <c:if test="${canEdit}">
+                <a href="${pageContext.request.contextPath}/userEdit?id=${u.id}">Edit</a>
+            </c:if>
+
+            <c:if test="${canDelete}">
+                <a href="${pageContext.request.contextPath}/delete?id=${u.id}">Delete</a>
+            </c:if>
+
+            <c:if test="${canChangeRole}">
+                <form action="${pageContext.request.contextPath}/changeRole" method="post" style="display:inline;">
+                    <input type="hidden" name="id" value="${u.id}" />
+                    <select name="role">
+                        <option value="ROLE_USER">User</option>
+                        <option value="ROLE_ADMINDEVELOPER">Admin</option>
+                    </select>
+                    <button type="submit">Change</button>
+                </form>
+            </c:if>
         </td>
     </tr>
     <%

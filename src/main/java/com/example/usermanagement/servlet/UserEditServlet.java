@@ -2,6 +2,7 @@ package com.example.usermanagement.servlet;
 
 
 import com.example.usermanagement.dao.UserDao;
+import com.example.usermanagement.dbutil.PermissionUtil;
 import com.example.usermanagement.model.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -28,6 +29,12 @@ public class UserEditServlet extends HttpServlet {
     }
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        User current = (User) req.getSession().getAttribute("user");
+        if (!PermissionUtil.hasPermission(current, "EDIT_USER")) {
+            resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Not authorized to edit users");
+            return;
+        }
+
         String idParam = req.getParameter("id");
         String userNameParam = req.getParameter("username");
         String passwordParam = req.getParameter("password");

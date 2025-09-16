@@ -2,6 +2,7 @@ package com.example.usermanagement.servlet;
 
 
 import com.example.usermanagement.dao.UserDao;
+import com.example.usermanagement.dbutil.PermissionUtil;
 import com.example.usermanagement.model.Role;
 import com.example.usermanagement.model.User;
 import jakarta.servlet.annotation.WebServlet;
@@ -17,31 +18,28 @@ public class DeleteUserServlet extends HttpServlet {
     private UserDao userDao = new UserDao();
 
     @Override
-    protected void doGet(HttpServletRequest req,  HttpServletResponse resp) throws IOException{
-        String idParam = req.getParameter("id");
-        User user = userDao.getUserById(Integer.parseInt(idParam));
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        // tylko dla zalogowanych i z DELETE_USER
+        User current = (User) req.getSession().getAttribute("user");
+        if (!PermissionUtil.hasPermission(current, "DELETE_USER")) {
+            resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Not authorized to delete users");
+            return;
+        }
 
+        String idParam = req.getParameter("id");
         if (idParam == null || idParam.isEmpty()) {
             resp.sendRedirect(req.getContextPath() + "/users");
             return;
         }
 
-        if (user.getRole() == null) {
-            user.setRole(new Role("ROLE_USER"));
+        int id = Integer.parseInt(idParam);
+        User target = userDao.getUserById(id);
+        if (target != null && "ROLE_ADMINDEVELOPER".equals(target.getRole().getName())) {
+            resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Cannot delete admin developer role user");
+            return;
         }
 
-
-        if ("ROLE_ADMINDEVELOPER".equals(user.getRole().getName())) {
-            throw new UnsupportedOperationException("Cannot delete ROLE_ADMINDEVELOPER!");
-        }
-
-        try {
-            int id = Integer.parseInt(idParam);
-            userDao.deleteUser(id);
-        } catch (NumberFormatException e) {
-            e.printStackTrace();
-        }
-
+        userDao.deleteUser(id);
         resp.sendRedirect(req.getContextPath() + "/users");
     }
 }

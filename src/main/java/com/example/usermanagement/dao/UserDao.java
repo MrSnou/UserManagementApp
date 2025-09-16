@@ -77,20 +77,34 @@ public class UserDao {
         String[] names = {"Alice", "Bob", "Charlie", "Diana", "Eve"};
         String[] domains = {"example.com", "mail.com", "test.org"};
 
-        for (int i = 0; i < numberOfUsers; i++) {
-            User u = new User();
-            String name = names[random.nextInt(names.length)] + i;
-            u.setUsername(name);
-            u.setPassword("pass" + i);
-            u.setEmail(name.toLowerCase() + "@" + domains[random.nextInt(domains.length)]);
-            try {
-                RoleDao roleDao = new RoleDao();
-                Role userRole = roleDao.getRoleByName("ROLE_USER");
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Transaction tx = session.beginTransaction();
+
+            Role userRole = session.createQuery("FROM Role WHERE name = :name", Role.class)
+                    .setParameter("name", "ROLE_USER")
+                    .uniqueResult();
+
+            for (int i = 0; i < numberOfUsers; i++) {
+                User u = new User();
+                String name = names[random.nextInt(names.length)] + "_" + System.currentTimeMillis() + "_" + i;
+                u.setUsername(name);
+                u.setPassword("pass" + i);
+                u.setEmail(name.toLowerCase() + "@" + domains[random.nextInt(domains.length)]);
                 u.setRole(userRole);
-            } catch (Exception e) {
-                e.printStackTrace();
+
+                boolean exists = session.createQuery("SELECT count(u) > 0 FROM User u WHERE u.username = :username", Boolean.class)
+                        .setParameter("username", name)
+                        .uniqueResult();
+
+                if (exists) {
+                    continue;
+                }
+                session.persist(u);
+
+                session.persist(u);
             }
-            addUser(u);
+
+            tx.commit();
         }
     }
 
@@ -125,6 +139,18 @@ public class UserDao {
             return sb.toString();
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException("Error hashing password", e);
+        }
+    }
+
+    public void mergeUser(User user) {
+        Transaction tx = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            tx = session.beginTransaction();
+            session.merge(user);
+            tx.commit();
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            throw e;
         }
     }
 }

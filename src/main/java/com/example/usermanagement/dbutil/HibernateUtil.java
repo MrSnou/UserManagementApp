@@ -8,7 +8,6 @@ public class HibernateUtil {
 
     private static SessionFactory buildSessionFactory() {
         try {
-
             SessionFactory factory = new Configuration().configure().buildSessionFactory();
             DataInitializer.init(factory);
             return factory;
