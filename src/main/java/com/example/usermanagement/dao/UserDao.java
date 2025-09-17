@@ -3,6 +3,7 @@ package com.example.usermanagement.dao;
 import com.example.usermanagement.dbutil.HibernateUtil;
 import com.example.usermanagement.model.Role;
 import com.example.usermanagement.model.User;
+import jakarta.servlet.ServletContextEvent;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -88,7 +89,7 @@ public class UserDao {
                 User u = new User();
                 String name = names[random.nextInt(names.length)] + "_" + System.currentTimeMillis() + "_" + i;
                 u.setUsername(name);
-                u.setPassword("pass" + i);
+                u.setPassword(passwordHashing("pass" + i));
                 u.setEmail(name.toLowerCase() + "@" + domains[random.nextInt(domains.length)]);
                 u.setRole(userRole);
 
@@ -151,6 +152,38 @@ public class UserDao {
         } catch (Exception e) {
             if (tx != null) tx.rollback();
             throw e;
+        }
+    }
+
+    public void initAdminDev() {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Transaction tx = session.beginTransaction();
+
+            User adminDev = session.createQuery(
+                            "FROM User u WHERE u.username = :username", User.class)
+                    .setParameter("username", "AdminDev")
+                    .uniqueResult();
+
+            if (adminDev == null) {
+                User newAdmin = new User();
+                newAdmin.setUsername("AdminDev");
+                newAdmin.setEmail("admin@example.com");
+                newAdmin.setPassword(passwordHashing("admindev"));
+
+                RoleDao roleDao = new RoleDao();
+                Role userRole = roleDao.getRoleByName("ROLE_ADMINDEVELOPER");
+                if (userRole == null) {
+                    throw new RuntimeException("Default role ROLE_ADMINDEVELOPER not found in database!");
+                }
+                newAdmin.setRole(userRole);
+
+                session.save(newAdmin);
+                System.out.println("AdminDev created!");
+            } else {
+                System.out.println("AdminDev already exists.");
+            }
+
+            tx.commit();
         }
     }
 }

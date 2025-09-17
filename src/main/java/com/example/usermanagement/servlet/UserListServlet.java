@@ -21,14 +21,12 @@ public class UserListServlet extends HttpServlet {
         List<User> users = userDao.getUsers();
         req.setAttribute("users", users);
 
-        // pobierz aktualnie zalogowanego użytkownika
         User sessionUser = (User) req.getSession().getAttribute("user");
 
         boolean canEdit = PermissionUtil.hasPermission(sessionUser, "EDIT_USER");
         boolean canDelete = PermissionUtil.hasPermission(sessionUser, "DELETE_USER");
         boolean canChangeRole = PermissionUtil.hasPermission(sessionUser, "CHANGE_ROLE");
 
-        // wrzucamy do requestu
         req.setAttribute("canEdit", canEdit);
         req.setAttribute("canDelete", canDelete);
         req.setAttribute("canChangeRole", canChangeRole);

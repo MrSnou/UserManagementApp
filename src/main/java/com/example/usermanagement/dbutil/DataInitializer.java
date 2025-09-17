@@ -42,11 +42,9 @@ public class DataInitializer {
             if (userRole == null) {
                 userRole = new Role("ROLE_USER");
                 userRole.getPermissions().add(view);
-                userRole.getPermissions().add(edit);
                 session.persist(userRole);
             } else {
                 userRole.getPermissions().add(view);
-                userRole.getPermissions().add(edit);
                 session.merge(userRole);
             }
 
@@ -56,13 +54,11 @@ public class DataInitializer {
                 adminRole.getPermissions().add(view);
                 adminRole.getPermissions().add(edit);
                 adminRole.getPermissions().add(del);
-                adminRole.getPermissions().add(change);
                 session.persist(adminRole);
             } else {
                 adminRole.getPermissions().add(view);
                 adminRole.getPermissions().add(edit);
                 adminRole.getPermissions().add(del);
-                adminRole.getPermissions().add(change);
                 session.merge(adminRole);
             }
 

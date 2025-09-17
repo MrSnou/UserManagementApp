@@ -44,7 +44,7 @@
                     <input type="hidden" name="id" value="${u.id}" />
                     <select name="role">
                         <option value="ROLE_USER">User</option>
-                        <option value="ROLE_ADMINDEVELOPER">Admin</option>
+                        <option value="ROLE_ADMIN">Admin</option>
                     </select>
                     <button type="submit">Change</button>
                 </form>
