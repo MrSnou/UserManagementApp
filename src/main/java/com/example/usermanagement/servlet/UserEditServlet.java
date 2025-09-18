@@ -36,6 +36,13 @@ public class UserEditServlet extends HttpServlet {
         }
 
         String idParam = req.getParameter("id");
+
+        User user = userDao.getUserById(Integer.parseInt(idParam));
+        if ("ROLE_ADMINDEVELOPER".equals(user.getRole().getName())) {
+            resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Cannot change data of admin developer");
+            return;
+        }
+
         String userNameParam = req.getParameter("username");
         String passwordParam = req.getParameter("password");
         String emailParam = req.getParameter("email");

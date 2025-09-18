@@ -37,6 +37,10 @@ public class ChangeRoleServlet extends HttpServlet {
         }
 
         User user = userDao.getUserById(id);
+        if ("ROLE_ADMINDEVELOPER".equals(user.getRole().getName())) {
+            resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Cannot change role of admin developer");
+            return;
+        }
         user.setRole(newRole);
         userDao.mergeUser(user);
         resp.sendRedirect(req.getContextPath() + "/users");

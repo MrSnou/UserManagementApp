@@ -66,4 +66,13 @@ public class Role {
             return "Role{id=" + id + ", name='" + name + "'}";
         }
     }
+    @Transient
+    public String getDisplayName() {
+        switch (this.name) {
+            case "ROLE_ADMIN": return "Admin";
+            case "ROLE_ADMINDEVELOPER": return "AdminDev";
+            case "ROLE_USER": return "User";
+            default: return this.name;
+        }
+    }
 }
