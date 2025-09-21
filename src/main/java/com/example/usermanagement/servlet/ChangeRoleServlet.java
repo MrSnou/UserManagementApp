@@ -3,6 +3,8 @@ package com.example.usermanagement.servlet;
 import com.example.usermanagement.dao.RoleDao;
 import com.example.usermanagement.dao.UserDao;
 import com.example.usermanagement.dbutil.PermissionUtil;
+import com.example.usermanagement.logs.ActionType;
+import com.example.usermanagement.logs.Logger;
 import com.example.usermanagement.model.Role;
 import com.example.usermanagement.model.User;
 import jakarta.servlet.Servlet;
@@ -36,14 +38,31 @@ public class ChangeRoleServlet extends HttpServlet {
             return;
         }
 
+
+
         User user = userDao.getUserById(id);
-        if ("ROLE_ADMINDEVELOPER".equals(user.getRole().getName())) {
-            resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Cannot change role of admin developer");
+        if ("ROLE_ADMINDEVELOPER".equals(newRole.getName())) {
+            if (!"AdminDev".equals(current.getUsername())) {
+                resp.sendError(HttpServletResponse.SC_FORBIDDEN,
+                        "Cannot assign role ROLE_ADMINDEVELOPER. Only AdminDev can do this.");
+                return;
+            }
+        }
+
+        if (user.getUsername().equals("AdminDev")) {
+            resp.sendError(HttpServletResponse.SC_FORBIDDEN,
+                    "Nice Try! *Wink*");
             return;
         }
+
         user.setRole(newRole);
         userDao.mergeUser(user);
+
+        Logger.log(current.getUsername(), user.getUsername(), ActionType.CHANGE_ROLE);
+
         resp.sendRedirect(req.getContextPath() + "/users");
+
+
     }
 
 }

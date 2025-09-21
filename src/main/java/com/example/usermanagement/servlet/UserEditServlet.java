@@ -3,6 +3,8 @@ package com.example.usermanagement.servlet;
 
 import com.example.usermanagement.dao.UserDao;
 import com.example.usermanagement.dbutil.PermissionUtil;
+import com.example.usermanagement.logs.ActionType;
+import com.example.usermanagement.logs.Logger;
 import com.example.usermanagement.model.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -51,6 +53,8 @@ public class UserEditServlet extends HttpServlet {
             int id = Integer.parseInt(idParam);
             userDao.editUser(id, userNameParam, passwordParam, emailParam);
         }
+
+        Logger.log(current.getUsername(), idParam, ActionType.EDIT_USERDATA);
 
         resp.sendRedirect(req.getContextPath() + "/users");
     }

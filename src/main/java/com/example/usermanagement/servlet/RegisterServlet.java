@@ -2,6 +2,8 @@ package com.example.usermanagement.servlet;
 
 import com.example.usermanagement.dao.RoleDao;
 import com.example.usermanagement.dao.UserDao;
+import com.example.usermanagement.logs.ActionType;
+import com.example.usermanagement.logs.Logger;
 import com.example.usermanagement.model.Role;
 import com.example.usermanagement.model.User;
 import jakarta.servlet.ServletException;
@@ -80,6 +82,8 @@ public class RegisterServlet extends HttpServlet {
         user.setRole(userRole);
 
         userDao.addUser(user);
+
+        Logger.log(user.getUsername(), null, ActionType.CREATE_USER);
 
         resp.sendRedirect("/users");
     }

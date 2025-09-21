@@ -22,6 +22,7 @@
 <body>
 <p><a href="<c:url value='/'/>">Back to Home</a></p>
 <p><a href="<c:url value='/users'/>">Show all users</a></p>
+<p><a href="<c:url value='/logs'/>">View Logs</a></p>
 
 <h1>Welcome, <%= user.getUsername() %>!</h1>
 

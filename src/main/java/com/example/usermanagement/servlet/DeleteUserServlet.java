@@ -3,6 +3,8 @@ package com.example.usermanagement.servlet;
 
 import com.example.usermanagement.dao.UserDao;
 import com.example.usermanagement.dbutil.PermissionUtil;
+import com.example.usermanagement.logs.ActionType;
+import com.example.usermanagement.logs.Logger;
 import com.example.usermanagement.model.Role;
 import com.example.usermanagement.model.User;
 import jakarta.servlet.annotation.WebServlet;
@@ -40,6 +42,9 @@ public class DeleteUserServlet extends HttpServlet {
         }
 
         userDao.deleteUser(id);
+
+        Logger.log(current.getUsername(), target.getUsername(), ActionType.DELETE_USER);
+
         resp.sendRedirect(req.getContextPath() + "/users");
     }
 }

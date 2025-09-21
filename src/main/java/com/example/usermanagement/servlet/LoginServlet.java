@@ -1,6 +1,8 @@
 package com.example.usermanagement.servlet;
 
 import com.example.usermanagement.dao.UserDao;
+import com.example.usermanagement.logs.ActionType;
+import com.example.usermanagement.logs.Logger;
 import com.example.usermanagement.model.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -41,9 +43,13 @@ public class LoginServlet extends HttpServlet {
             String hashedPassword = userDao.passwordHashing(password).trim();
             if (hashedPassword.equals(user.getPassword())) {
                 req.getSession().setAttribute("user", user);
+
+                Logger.log(user.getUsername(),null, ActionType.LOGIN);
+
                 resp.sendRedirect(req.getContextPath() + "/pages/home.jsp");
             } else {
                 req.setAttribute("error", "Wrong password.");
+                Logger.log(user.getUsername(),null, ActionType.LOGIN_FAILURE_WRONG_PASS);
                 req.getRequestDispatcher("/pages/login.jsp").forward(req, resp);
             }
 

@@ -15,6 +15,9 @@
 <p><a href="<c:url value='/'/>">Back to Home</a></p>
 <a href="<c:url value='/register'/>">Register new user</a>
 <p><a href="<c:url value='/login'/>">Login</a></p>
+<form action="<%=request.getContextPath()%>/logout" method="post">
+    <button type="submit">Logout</button>
+</form>
 <h2>Registered Users</h2>
 <table border="1">
     <tr><th> ID </th><th> Username </th><th> Email </th><th> Role </th><th> Actions </th></tr>

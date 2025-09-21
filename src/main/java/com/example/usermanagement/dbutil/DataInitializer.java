@@ -1,11 +1,13 @@
 package com.example.usermanagement.dbutil;
 
-import com.example.usermanagement.dao.UserDao;
 import com.example.usermanagement.model.Permission;
 import com.example.usermanagement.model.Role;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class DataInitializer {
 
@@ -13,72 +15,59 @@ public class DataInitializer {
         try (Session session = sessionFactory.openSession()) {
             Transaction tx = session.beginTransaction();
 
+            // permissions
+            Permission view = getOrCreatePermission(session, "VIEW_DB", "Can view user list");
+            Permission edit = getOrCreatePermission(session, "EDIT_USER", "Can edit users");
+            Permission del = getOrCreatePermission(session, "DELETE_USER", "Can delete users");
+            Permission change = getOrCreatePermission(session, "CHANGE_ROLE", "Can change user roles");
+            Permission logs = getOrCreatePermission(session, "VIEW_LOGS", "Can view server logs");
 
-            Permission view = session.createQuery("FROM Permission WHERE name = 'VIEW_DB'", Permission.class).uniqueResult();
-            if (view == null) {
-                view = new Permission("VIEW_DB", "Can view user list");
-                session.persist(view);
-            }
-
-            Permission edit = session.createQuery("FROM Permission WHERE name = 'EDIT_USER'", Permission.class).uniqueResult();
-            if (edit == null) {
-                edit = new Permission("EDIT_USER", "Can edit users");
-                session.persist(edit);
-            }
-
-            Permission del = session.createQuery("FROM Permission WHERE name = 'DELETE_USER'", Permission.class).uniqueResult();
-            if (del == null) {
-                del = new Permission("DELETE_USER", "Can delete users");
-                session.persist(del);
-            }
-
-            Permission change = session.createQuery("FROM Permission WHERE name = 'CHANGE_ROLE'", Permission.class).uniqueResult();
-            if (change == null) {
-                change = new Permission("CHANGE_ROLE", "Can change user roles");
-                session.persist(change);
-            }
-
-            Role userRole = session.createQuery("FROM Role WHERE name = 'ROLE_USER'", Role.class).uniqueResult();
-            if (userRole == null) {
-                userRole = new Role("ROLE_USER");
-                userRole.getPermissions().add(view);
-                session.persist(userRole);
-            } else {
-                userRole.getPermissions().add(view);
-                session.merge(userRole);
-            }
-
-            Role adminRole = session.createQuery("FROM Role WHERE name = 'ROLE_ADMIN'", Role.class).uniqueResult();
-            if (adminRole == null) {
-                adminRole = new Role("ROLE_ADMIN");
-                adminRole.getPermissions().add(view);
-                adminRole.getPermissions().add(edit);
-                adminRole.getPermissions().add(del);
-                session.persist(adminRole);
-            } else {
-                adminRole.getPermissions().add(view);
-                adminRole.getPermissions().add(edit);
-                adminRole.getPermissions().add(del);
-                session.merge(adminRole);
-            }
-
-            Role adminDevRole = session.createQuery("FROM Role WHERE name = 'ROLE_ADMINDEVELOPER'", Role.class).uniqueResult();
-            if (adminDevRole == null) {
-                adminDevRole = new Role("ROLE_ADMINDEVELOPER");
-                adminDevRole.getPermissions().add(view);
-                adminDevRole.getPermissions().add(edit);
-                adminDevRole.getPermissions().add(del);
-                adminDevRole.getPermissions().add(change);
-                session.persist(adminDevRole);
-            } else {
-                adminDevRole.getPermissions().add(view);
-                adminDevRole.getPermissions().add(edit);
-                adminDevRole.getPermissions().add(del);
-                adminDevRole.getPermissions().add(change);
-                session.merge(adminDevRole);
-            }
+            // roles (ustawiamy dokładnie wymaganą listę permisji)
+            getOrCreateOrUpdateRole(session, "ROLE_USER", setOf(view));
+            getOrCreateOrUpdateRole(session, "ROLE_ADMIN", setOf(view, edit, del, logs));
+            getOrCreateOrUpdateRole(session, "ROLE_ADMINDEVELOPER", setOf(view, edit, del, change, logs));
 
             tx.commit();
         }
+    }
+
+    private static Permission getOrCreatePermission(Session session, String name, String description) {
+        Permission p = session.createQuery("FROM Permission WHERE name = :name", Permission.class)
+                .setParameter("name", name)
+                .uniqueResult();
+        if (p == null) {
+            p = new Permission(name, description);
+            session.persist(p);
+        } else {
+            // opcjonalnie: aktualizuj description
+            p.setDescription(description);
+            session.merge(p);
+        }
+        return p;
+    }
+
+    private static Role getOrCreateOrUpdateRole(Session session, String roleName, Set<Permission> permissions) {
+        Role role = session.createQuery("FROM Role WHERE name = :name", Role.class)
+                .setParameter("name", roleName)
+                .uniqueResult();
+        if (role == null) {
+            role = new Role(roleName);
+            role.setPermissions(new HashSet<>(permissions));
+            session.persist(role);
+        } else {
+            // wyczyść stare i ustaw dokładnie taki zestaw permisji, jaki chcemy
+            role.getPermissions().clear();
+            role.getPermissions().addAll(permissions);
+            session.merge(role);
+        }
+        return role;
+    }
+
+    // mała pomocnicza metoda do wygodnego tworzenia setów
+    @SafeVarargs
+    private static <T> Set<T> setOf(T... items) {
+        Set<T> s = new HashSet<>();
+        for (T t : items) s.add(t);
+        return s;
     }
 }
