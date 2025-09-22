@@ -3,6 +3,7 @@ package com.example.usermanagement.logs;
 import com.example.usermanagement.logs.ActionType;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class LogEntry {
     private String author;
@@ -19,9 +20,11 @@ public class LogEntry {
     public ActionType getAction() {
         return action;
     }
-    public LocalDateTime getTime() {
-        return time;
-    }
+
+    public static final DateTimeFormatter FORMATTER =
+            DateTimeFormatter.ofPattern("dd-MM-yyyy 'T' HH:mm:ss");
+
+
 
     public LogEntry(String author, ActionType action) {
         this.author = author;
@@ -35,6 +38,10 @@ public class LogEntry {
         this.target = target;
         this.action = action;
         this.time = LocalDateTime.now();
+    }
+
+    public String getFormattedTime() {
+        return time.format(FORMATTER);
     }
 
     @Override
