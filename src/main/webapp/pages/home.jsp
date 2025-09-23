@@ -24,11 +24,6 @@
             padding: 10px;
             text-align: left;
         }
-        .logout-btn {
-            position: absolute;
-            top: 10px;
-            right: 20px;
-        }
         .main-content {
             margin-top: 50px;
         }
@@ -48,11 +43,7 @@
 </head>
 <body>
 
-<div class="top-bar">
-    <form class="logout-btn" action="<%=request.getContextPath()%>/logout" method="post">
-        <button type="submit">Logout</button>
-    </form>
-</div>
+<%@ include file="/WEB-INF/jsp/fragments/logout.jspf" %>
 
 <div class="main-content">
     <h1>Welcome, <%= user.getUsername() %>!</h1>

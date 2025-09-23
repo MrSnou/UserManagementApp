@@ -10,22 +10,6 @@
             margin: 0;
             padding: 0;
         }
-        .logout {
-            position: absolute;
-            top: 15px;
-            right: 20px;
-        }
-        .logout button {
-            background: #ff4d4d;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-        .logout button:hover {
-            background: #e60000;
-        }
         .container {
             display: flex;
             justify-content: center;
@@ -73,11 +57,7 @@
     </style>
 </head>
 <body>
-<div class="logout">
-    <form action="<%=request.getContextPath()%>/logout" method="post">
-        <button type="submit">Logout</button>
-    </form>
-</div>
+<%@ include file="/WEB-INF/jsp/fragments/logout.jspf" %>
 
 <div class="container">
     <div class="card">
@@ -100,8 +80,7 @@
         </table>
 
         <div class="links">
-            <a href="<c:url value='/'/>">Home</a> |
-            <a href="<c:url value='/users'/>">All users</a>
+            <a href="<c:url value='/pages/home.jsp'/>" class="btn">Home</a>
         </div>
     </div>
 </div>

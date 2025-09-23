@@ -85,6 +85,6 @@ public class RegisterServlet extends HttpServlet {
 
         Logger.log(user.getUsername(), null, ActionType.CREATE_USER);
 
-        resp.sendRedirect("/users");
+        resp.sendRedirect("/");
     }
 }

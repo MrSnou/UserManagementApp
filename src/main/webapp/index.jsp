@@ -3,14 +3,15 @@
 <html>
 <head>
     <title>User Management App</title>
+    <jsp:include page="WEB-INF/jsp/fragments/header.jspf"/>
 </head>
 <body>
-<h1>Welcome to UserManagementApp!</h1>
+<div class="container">
+    <h1>Welcome to UserManagementApp!</h1>
 
-<p><a href="<c:url value='/login'/>">Login</a></p>
-<a href="<c:url value='/register'/>">Register new user</a>
-<p><a href="<c:url value='/hello'/>">Go to HelloServlet</a></p>
-<p><a href="<c:url value='/users'/>">Show all users</a></p>
-
+    <a href="<c:url value='/login'/>" class="btn">Login</a>
+    <a href="<c:url value='/register'/>" class="btn">Register new user</a>
+    <a href="<c:url value='/hello'/>" class="btn">Go to HelloServlet</a>
+</div>
 </body>
 </html>

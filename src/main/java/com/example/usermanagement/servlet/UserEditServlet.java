@@ -54,7 +54,7 @@ public class UserEditServlet extends HttpServlet {
             userDao.editUser(id, userNameParam, passwordParam, emailParam);
         }
 
-        Logger.log(current.getUsername(), idParam, ActionType.EDIT_USERDATA);
+        Logger.log(current.getUsername(), userDao.getUserById(Integer.parseInt(idParam)).getUsername(), ActionType.EDIT_USERDATA);
 
         resp.sendRedirect(req.getContextPath() + "/users");
     }
