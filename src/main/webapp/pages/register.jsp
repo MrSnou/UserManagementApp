@@ -75,9 +75,21 @@
     <div class="card">
         <h2>Register</h2>
         <form action="<%= request.getContextPath() %>/register" method="post">
-            <input type="text" name="username" placeholder="Username" required>
+            <input type="text" name="username" placeholder="Username" value="${username}" required>
+            <c:if test="${not empty usernameError}">
+                <div class="error">${usernameError}</div>
+            </c:if>
+
             <input type="password" name="password" placeholder="Password" required>
-            <input type="email" name="email" placeholder="Email Address" required>
+            <c:if test="${not empty passwordError}">
+                <div class="error">${passwordError}</div>
+            </c:if>
+
+            <input type="email" name="email" placeholder="Email Address" value="${email}" required>
+            <c:if test="${not empty emailError}">
+                <div class="error">${emailError}</div>
+            </c:if>
+
             <button type="submit">Register</button>
         </form>
 

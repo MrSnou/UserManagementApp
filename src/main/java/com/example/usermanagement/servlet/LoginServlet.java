@@ -9,6 +9,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
@@ -40,13 +41,20 @@ public class LoginServlet extends HttpServlet {
                 req.getRequestDispatcher("/pages/login.jsp").forward(req, resp);
                 return;
             }
+
             String hashedPassword = userDao.passwordHashing(password).trim();
             if (hashedPassword.equals(user.getPassword())) {
-                req.getSession().setAttribute("user", user);
 
-                Logger.log(user.getUsername(),null, ActionType.LOGIN);
+                HttpSession old = req.getSession(false);
+                if (old != null) old.invalidate();
+                HttpSession session = req.getSession(true);
+
+                session.setAttribute("user", user);
+
+                Logger.log(user.getUsername(), null, ActionType.LOGIN);
 
                 resp.sendRedirect(req.getContextPath() + "/pages/home.jsp");
+
             } else {
                 req.setAttribute("error", "Wrong password.");
                 Logger.log(user.getUsername(),null, ActionType.LOGIN_FAILURE_WRONG_PASS);
@@ -55,7 +63,8 @@ public class LoginServlet extends HttpServlet {
 
         } catch (Exception ex) {
             ex.printStackTrace();
-            req.setAttribute("error", "Unexpected error: " + ex.getMessage());
+            req.setAttribute("error", "Unexpected error occurred. Please try again later.");
+            ex.printStackTrace();
             req.getRequestDispatcher("/pages/login.jsp").forward(req, resp);
         }
 

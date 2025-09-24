@@ -30,7 +30,7 @@ public class UserEditServlet extends HttpServlet {
         }
     }
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
         User current = (User) req.getSession().getAttribute("user");
         if (!PermissionUtil.hasPermission(current, "EDIT_USER")) {
             resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Not authorized to edit users");
@@ -48,6 +48,27 @@ public class UserEditServlet extends HttpServlet {
         String userNameParam = req.getParameter("username");
         String passwordParam = req.getParameter("password");
         String emailParam = req.getParameter("email");
+
+        if (userNameParam == null || !userNameParam.matches("^[A-Za-z0-9]+$")) {
+            req.setAttribute("usernameError", "Username can only contain letters and numbers (A-Z, a-z, 0-9).");
+            req.setAttribute("user", user); // żeby formularz miał dane
+            req.getRequestDispatcher("pages/userEdit.jsp").forward(req, resp);
+            return;
+        }
+
+        if (passwordParam == null || !passwordParam.matches("^[A-Za-z0-9!@#$^&*()_\\-+=]+$")) {
+            req.setAttribute("passwordError", "Password can only contain letters and numbers (A-Z, a-z, 0-9).");
+            req.setAttribute("user", user);
+            req.getRequestDispatcher("pages/userEdit.jsp").forward(req, resp);
+            return;
+        }
+
+        if (emailParam == null || !emailParam.matches("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$")) {
+            req.setAttribute("emailError", "Invalid email format.");
+            req.setAttribute("user", user);
+            req.getRequestDispatcher("pages/userEdit.jsp").forward(req, resp);
+            return;
+        }
 
         if (idParam != null) {
             int id = Integer.parseInt(idParam);

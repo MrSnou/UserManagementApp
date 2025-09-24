@@ -26,9 +26,28 @@ public class RegisterServlet extends HttpServlet {
     }
 
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String username = req.getParameter("username");
+        String username = req.getParameter("username"); // TO-DO - Regex
         String password = req.getParameter("password");
         String email = req.getParameter("email");
+
+        if (username == null || !username.matches("^[A-Za-z0-9]+$")) {
+            req.setAttribute("usernameError", "Username can only contain letters and numbers (A-Z, a-z, 0-9).");
+            req.getRequestDispatcher("pages/register.jsp").forward(req, resp);
+            return;
+        }
+
+        if (password == null || !password.matches("^[A-Za-z0-9!@#$^&*()_\\-+=]+$")) {
+            req.setAttribute("passwordError", "Password can only contain letters and numbers (A-Z, a-z, 0-9).");
+            req.getRequestDispatcher("pages/register.jsp").forward(req, resp);
+            return;
+        }
+
+        if (email == null || !email.matches("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$")) {
+            req.setAttribute("emailError", "Invalid email format.");
+            req.getRequestDispatcher("pages/register.jsp").forward(req, resp);
+            return;
+        }
+
         if (username == null || username.isEmpty() ||
                 password == null || password.isEmpty() ||
                 email == null || email.isEmpty()) {

@@ -109,10 +109,28 @@
             <input type="hidden" name="id" value="<%= u.getId() %>">
 
             <input type="text" name="username" value="<%= u.getUsername() %>" placeholder="Username" required>
+            <c:if test="${not empty usernameError}">
+                <div style="color:red; font-size: 12px; text-align: left;">
+                        ${usernameError}
+                </div>
+            </c:if>
+
 
             <input type="password" name="password" value="<%= u.getPassword() %>" placeholder="Password" required>
+            <c:if test="${not empty passwordError}">
+                <div style="color:red; font-size: 12px; text-align: left;">
+                        ${passwordError}
+                </div>
+            </c:if>
+
 
             <input type="email" name="email" value="<%= u.getEmail() %>" placeholder="Email Address" required>
+            <c:if test="${not empty emailError}">
+                <div style="color:red; font-size: 12px; text-align: left;">
+                        ${emailError}
+                </div>
+            </c:if>
+
 
             <button type="submit">Save changes</button>
         </form>
