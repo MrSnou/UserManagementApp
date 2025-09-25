@@ -9,6 +9,8 @@ import org.hibernate.Transaction;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -87,7 +89,12 @@ public class UserDao {
 
             for (int i = 0; i < numberOfUsers; i++) {
                 User u = new User();
-                String name = names[random.nextInt(names.length)] + "_" + System.currentTimeMillis() + "_" + i;
+
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyyyyHHmmss");
+                LocalDateTime now = LocalDateTime.now();
+                String time = now.format(formatter);
+
+                String name = names[random.nextInt(names.length)] + "_" + time + "_" + i;
                 u.setUsername(name);
                 u.setPassword(passwordHashing("pass" + i));
                 u.setEmail(name.toLowerCase() + "@" + domains[random.nextInt(domains.length)]);

@@ -1,20 +1,12 @@
-<%@ page import="com.example.usermanagement.model.User" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ page session="true" %>
-<%
-    User user = (User) session.getAttribute("user");
-    if (user == null) {
-        response.sendRedirect(request.getContextPath() + "/pages/login.jsp");
-        return;
-    }
-%>
 <html>
 <head>
     <title>Home</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            text-align: center; /* wyśrodkowanie treści */
+            text-align: center;
             margin: 0;
             padding: 0;
         }
@@ -46,8 +38,8 @@
 <%@ include file="/WEB-INF/jsp/fragments/logout.jspf" %>
 
 <div class="main-content">
-    <h1>Welcome, <%= user.getUsername() %>!</h1>
-    <p>Email: <%= user.getEmail() %></p>
+    <h1>Welcome, ${user.username}!</h1>
+    <p>Email: ${user.email}</p>
 
     <div class="nav-links">
         <a href="<c:url value='/users'/>">Show all users</a>
@@ -56,6 +48,16 @@
             <a href="<c:url value='/logs'/>">View Logs</a>
         </c:if>
     </div>
+
+    <c:if test="${user.role.name eq 'ROLE_ADMINDEVELOPER'}">
+        <div class="subform">
+            <h3>Or add random TEST users</h3>
+            <form action="<c:url value='/addRandomUsers'/>" method="post">
+                <input type="number" name="count" value="1" min="1" />
+                <button type="submit">Add random users</button>
+            </form>
+        </div>
+    </c:if>
 </div>
 
 </body>

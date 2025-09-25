@@ -4,6 +4,7 @@ package com.example.usermanagement.servlet;
 import com.example.usermanagement.dao.UserDao;
 import com.example.usermanagement.logs.ActionType;
 import com.example.usermanagement.logs.Logger;
+import com.example.usermanagement.model.User;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,7 +27,8 @@ public class AddRandomUsersServlet extends HttpServlet {
                 count = 1;
             }
 
-            Logger.log("Guest", String.valueOf(count), ActionType.ADD_RANDOM_USERS);
+            User current = (User) req.getSession().getAttribute("user");
+            Logger.log(current.getUsername(), String.valueOf(count), ActionType.ADD_RANDOM_USERS);
 
             userDao.addRandomUsers(count);
 

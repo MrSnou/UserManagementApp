@@ -39,7 +39,6 @@ public class DataInitializer {
             p = new Permission(name, description);
             session.persist(p);
         } else {
-            // opcjonalnie: aktualizuj description
             p.setDescription(description);
             session.merge(p);
         }
@@ -55,7 +54,6 @@ public class DataInitializer {
             role.setPermissions(new HashSet<>(permissions));
             session.persist(role);
         } else {
-            // wyczyść stare i ustaw dokładnie taki zestaw permisji, jaki chcemy
             role.getPermissions().clear();
             role.getPermissions().addAll(permissions);
             session.merge(role);
@@ -63,7 +61,6 @@ public class DataInitializer {
         return role;
     }
 
-    // mała pomocnicza metoda do wygodnego tworzenia setów
     @SafeVarargs
     private static <T> Set<T> setOf(T... items) {
         Set<T> s = new HashSet<>();

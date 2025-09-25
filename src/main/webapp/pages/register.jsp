@@ -97,14 +97,6 @@
             <p class="error">${error}</p>
         </c:if>
 
-        <div class="subform">
-            <h3>Or add random TEST users</h3>
-            <form action="<%= request.getContextPath() %>/addRandomUsers" method="post">
-                <input type="number" name="count" value="3" min="1" />
-                <button type="submit">Add random users</button>
-            </form>
-        </div>
-
         <div class="links">
             <a href="<c:url value='/'/>">Home</a> |
             <a href="<c:url value='/login'/>">Login</a>
