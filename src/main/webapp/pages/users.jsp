@@ -63,9 +63,16 @@
 <%@ include file="/WEB-INF/jsp/fragments/logout.jspf" %>
 
 
+
+
 <div class="container">
     <div class="card">
         <h2>Registered Users</h2>
+        <c:if test="${not empty errorMessage}">
+            <div style="color:red; font-weight:bold; margin:10px 0; text-align:center;">
+                    ${errorMessage}
+            </div>
+        </c:if>
         <table>
             <tr>
                 <th>ID</th>
@@ -77,8 +84,12 @@
             <c:forEach var="u" items="${users}">
                 <tr>
                     <td>${u.id}</td>
-                    <td>${u.username}</td>
-                    <td>${u.email}</td>
+                    <td title="${u.username}" style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            ${u.username}
+                    </td>
+                    <td title="${u.email}" style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            ${u.email}
+                    </td>
                     <td>${u.role.displayName}</td>
                     <td class="actions">
                         <c:if test="${canEdit}">
@@ -105,10 +116,47 @@
             </c:forEach>
         </table>
 
+
+        <c:set var="start" value="${currentPage - 2}" />
+        <c:set var="end" value="${currentPage + 2}" />
+        <c:if test="${start < 1}">
+            <c:set var="start" value="1" />
+        </c:if>
+        <c:if test="${end > totalPages}">
+            <c:set var="end" value="${totalPages}" />
+        </c:if>
+
+        <c:forEach begin="${start}" end="${end}" var="i">
+            <c:choose>
+                <c:when test="${i == currentPage}">
+                    <span style="font-weight:bold; margin:0 5px;">${i}</span>
+                </c:when>
+                <c:otherwise>
+                    <a href="${pageContext.request.contextPath}/users?page=${i}" style="margin:0 5px;">${i}</a>
+                </c:otherwise>
+            </c:choose>
+        </c:forEach>
+
+        <div style="margin-top:20px;">
+            <c:if test="${currentPage > 1}">
+                <a href="${pageContext.request.contextPath}/users?page=${currentPage - 1}">Previous</a>
+            </c:if>
+
+            <span style="margin:0 15px;">
+        Page ${currentPage} of ${totalPages}
+    </span>
+
+            <c:if test="${currentPage < totalPages}">
+                <a href="${pageContext.request.contextPath}/users?page=${currentPage + 1}">Next</a>
+            </c:if>
+        </div>
+
+
         <div class="links">
             <a href="<c:url value='/pages/home.jsp'/>" class="btn">Home</a>
         </div>
     </div>
 </div>
+
 </body>
 </html>

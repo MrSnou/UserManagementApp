@@ -30,8 +30,8 @@ public class RegisterServlet extends HttpServlet {
         String password = req.getParameter("password");
         String email = req.getParameter("email");
 
-        if (username == null || !username.matches("^[A-Za-z0-9]+$")) {
-            req.setAttribute("usernameError", "Username can only contain letters and numbers (A-Z, a-z, 0-9).");
+        if (username == null || !username.matches("^[A-Za-z0-9]+$") || username.length() > 32) {
+            req.setAttribute("usernameError", "Username can only contain letters, numbers (A-Z, a-z, 0-9) and have to be shorter than 32 characters.");
             req.getRequestDispatcher("pages/register.jsp").forward(req, resp);
             return;
         }
@@ -42,7 +42,19 @@ public class RegisterServlet extends HttpServlet {
             return;
         }
 
-        if (email == null || !email.matches("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$")) {
+        if (email == null || email.length() > 64) {
+            req.setAttribute("emailError", "Email can't be longer than 64 characters.");
+            req.getRequestDispatcher("pages/register.jsp").forward(req, resp);
+            return;
+        }
+
+        if (!email.contains("@")) {
+            req.setAttribute("error", "Email is not valid");
+            req.getRequestDispatcher("pages/register.jsp").forward(req, resp);
+            return;
+        }
+
+        if (!email.matches("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$")) {
             req.setAttribute("emailError", "Invalid email format.");
             req.getRequestDispatcher("pages/register.jsp").forward(req, resp);
             return;
@@ -52,11 +64,6 @@ public class RegisterServlet extends HttpServlet {
                 password == null || password.isEmpty() ||
                 email == null || email.isEmpty()) {
             req.setAttribute("error", "Please fill all the fields");
-            req.getRequestDispatcher("pages/register.jsp").forward(req, resp);
-            return;
-        }
-        if (!email.contains("@")) {
-            req.setAttribute("error", "Email is not valid");
             req.getRequestDispatcher("pages/register.jsp").forward(req, resp);
             return;
         }

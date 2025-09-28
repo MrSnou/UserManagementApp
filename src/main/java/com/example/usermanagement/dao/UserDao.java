@@ -193,6 +193,23 @@ public class UserDao {
             tx.commit();
         }
     }
+
+    public List<User> getUsersPaged(int page, int pageSize) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.createQuery("FROM User ORDER BY id", User.class)
+                    .setFirstResult((page - 1) * pageSize).setMaxResults(pageSize).list();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
+
+    public long countUsers() {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.createQuery("SELECT COUNT(u) FROM User u", Long.class).uniqueResult();
+        }
+    }
+
 }
 
 
