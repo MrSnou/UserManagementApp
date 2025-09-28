@@ -10,6 +10,4 @@
 
     <display-name>My Web Application</display-name>
 
-    <!-- Opcjonalnie możesz tutaj dodać filtry, servlety, itp. -->
-
 </web-app>
