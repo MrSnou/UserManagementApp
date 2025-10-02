@@ -4,11 +4,22 @@ import com.example.usermanagement.dbutil.HibernateUtil;
 import com.example.usermanagement.model.Permission;
 import com.example.usermanagement.model.Role;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 
 public class RoleDao {
+    private final SessionFactory sessionFactory;
+
+    public RoleDao() {
+        this(HibernateUtil.getSessionFactory());
+    }
+
+    public RoleDao(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
+    }
+
     public Role getRoleByName(String name) {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try (Session session = sessionFactory.openSession()) {
             return session.createQuery("FROM Role WHERE name = :name", Role.class)
                     .setParameter("name", name)
                     .uniqueResult();
@@ -17,7 +28,7 @@ public class RoleDao {
 
     public void save(Role role) {
         Transaction tx = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try (Session session = sessionFactory.openSession()) {
             tx = session.beginTransaction();
             session.persist(role);
             tx.commit();
@@ -30,7 +41,7 @@ public class RoleDao {
     }
     public void addPermissionToRole(String roleName, String permissionName) {
         Transaction tx = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try (Session session = sessionFactory.openSession()) {
             tx = session.beginTransaction();
             Role role = session.createQuery("FROM Role WHERE name = :name", Role.class)
                     .setParameter("name", roleName)

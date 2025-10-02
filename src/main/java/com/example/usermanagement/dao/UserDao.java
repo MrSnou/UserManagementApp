@@ -5,6 +5,7 @@ import com.example.usermanagement.model.Role;
 import com.example.usermanagement.model.User;
 import jakarta.servlet.ServletContextEvent;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 
 import java.security.MessageDigest;
@@ -17,10 +18,21 @@ import java.util.Random;
 
 
 public class UserDao {
+    private final SessionFactory sessionFactory;
+
+    public UserDao() {
+        this(HibernateUtil.getSessionFactory());
+    }
+
+    // Constructor for test use
+    public UserDao(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
+    }
+
 
     public void addUser(User user) {
         Transaction tx = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try (Session session = sessionFactory.openSession()) {
             tx = session.beginTransaction();
             user.setPassword(passwordHashing(user.getPassword()));
             session.persist(user);
@@ -32,7 +44,7 @@ public class UserDao {
     }
 
     public List<User> getUsers() {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try (Session session = sessionFactory.openSession()) {
             return session.createQuery("FROM User", User.class).list();
         } catch (Exception e) {
             e.printStackTrace();
@@ -41,7 +53,7 @@ public class UserDao {
     }
 
     public User getUserByUsername(String username) {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try (Session session = sessionFactory.openSession()) {
             return session.createQuery("FROM User WHERE username = :username", User.class)
                     .setParameter("username", username)
                     .uniqueResult();
@@ -52,7 +64,7 @@ public class UserDao {
     }
 
     public User getUserById(int id) {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try (Session session = sessionFactory.openSession()) {
             return session.get(User.class, id);
         } catch (Exception e) {
             e.printStackTrace();
@@ -62,7 +74,7 @@ public class UserDao {
 
     public void deleteUser(int id) {
         Transaction tx = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try (Session session = sessionFactory.openSession()) {
             tx = session.beginTransaction();
             User user = session.get(User.class, id);
             if (user != null) {
@@ -80,7 +92,7 @@ public class UserDao {
         String[] names = {"Alice", "Bob", "Charlie", "Diana", "Eve"};
         String[] domains = {"example.com", "mail.com", "test.org"};
 
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try (Session session = sessionFactory.openSession()) {
             Transaction tx = session.beginTransaction();
 
             Role userRole = session.createQuery("FROM Role WHERE name = :name", Role.class)
@@ -118,7 +130,7 @@ public class UserDao {
 
     public void editUser(int id, String userName, String password, String email) {
         Transaction tx = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try (Session session = sessionFactory.openSession()) {
             tx = session.beginTransaction();
             User user = session.get(User.class, id);
             if (user != null) {
@@ -152,7 +164,7 @@ public class UserDao {
 
     public void mergeUser(User user) {
         Transaction tx = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try (Session session = sessionFactory.openSession()) {
             tx = session.beginTransaction();
             session.merge(user);
             tx.commit();
@@ -163,7 +175,7 @@ public class UserDao {
     }
 
     public void initAdminDev() {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try (Session session = sessionFactory.openSession()) {
             Transaction tx = session.beginTransaction();
 
             User adminDev = session.createQuery(
@@ -195,7 +207,7 @@ public class UserDao {
     }
 
     public List<User> getUsersPaged(int page, int pageSize) {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try (Session session = sessionFactory.openSession()) {
             return session.createQuery("FROM User ORDER BY id", User.class)
                     .setFirstResult((page - 1) * pageSize).setMaxResults(pageSize).list();
         } catch (Exception e) {
@@ -205,7 +217,7 @@ public class UserDao {
     }
 
     public long countUsers() {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try (Session session = sessionFactory.openSession()) {
             return session.createQuery("SELECT COUNT(u) FROM User u", Long.class).uniqueResult();
         }
     }
