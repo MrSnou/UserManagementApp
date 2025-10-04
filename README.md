@@ -1,4 +1,4 @@
-<h1>User Management App which shows my skill in Java, servlets, working with SQL and Hibernate, CRUD in MVC pattern.</h1>
+<h1><center>User Management App which shows my skill in Java, servlets, working with SQL and Hibernate, CRUD in MVC pattern.</center></h1>
 
 
 <p>In the app, we have clear division between backend logic, adapters for html in servlets and view in actuall HTML/CSS sites<br> (with thoose i needed AI help, so i dont take credit for view inself, i'm trying to focus on java, but i'm eager to learn).</br></p>
