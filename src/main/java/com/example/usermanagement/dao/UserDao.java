@@ -166,7 +166,17 @@ public class UserDao {
         Transaction tx = null;
         try (Session session = sessionFactory.openSession()) {
             tx = session.beginTransaction();
-            session.merge(user);
+
+            User existingUser = session.get(User.class, user.getId());
+            if (existingUser != null) {
+                if (user.getUsername() != null) existingUser.setUsername(user.getUsername());
+                if (user.getEmail() != null) existingUser.setEmail(user.getEmail());
+                if (user.getPassword() != null) existingUser.setPassword(user.getPassword());
+                session.merge(existingUser);
+            } else {
+                throw new NullPointerException("User do not exist");
+            }
+
             tx.commit();
         } catch (Exception e) {
             if (tx != null) tx.rollback();
