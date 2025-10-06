@@ -163,18 +163,15 @@ public class UserDao {
     }
 
     public void mergeUser(User user) {
+        if (user == null) {
+            throw new IllegalArgumentException("User cannot be null");
+        }
         Transaction tx = null;
         try (Session session = sessionFactory.openSession()) {
             tx = session.beginTransaction();
 
-            User existingUser = session.get(User.class, user.getId());
-            if (existingUser != null) {
-                if (user.getUsername() != null) existingUser.setUsername(user.getUsername());
-                if (user.getEmail() != null) existingUser.setEmail(user.getEmail());
-                if (user.getPassword() != null) existingUser.setPassword(user.getPassword());
-                session.merge(existingUser);
-            } else {
-                throw new NullPointerException("User do not exist");
+            if (user != null) {
+                session.merge(user);
             }
 
             tx.commit();

@@ -3,11 +3,16 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.example</groupId>
   <artifactId>usermanagement</artifactId>
-  <packaging>war</packaging>
+    <packaging>jar</packaging>
   <version>1.0-SNAPSHOT</version>
   <name>usermanagement Maven Webapp</name>
   <url>http://maven.apache.org</url>
   <dependencies>
+      <dependency>
+          <groupId>mysql</groupId>
+          <artifactId>mysql-connector-java</artifactId>
+          <version>8.0.33</version>
+      </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -76,7 +81,13 @@
           <scope>compile</scope>
       </dependency>
   </dependencies>
-  <build>
-    <finalName>usermanagement</finalName>
-  </build>
+      <build>
+          <plugins>
+              <plugin>
+                  <groupId>org.springframework.boot</groupId>
+                  <artifactId>spring-boot-maven-plugin</artifactId>
+              </plugin>
+          </plugins>
+          <finalName>usermanagement</finalName>
+      </build>
 </project>

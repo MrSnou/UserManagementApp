@@ -181,34 +181,11 @@ public class UserDaoTests {
         Assertions.assertNotEquals(basePass, hashedPass);
     }
 
-    @Test
-    void testMergeUser() {
-        User u1 = new User();
-        u1.setUsername("TestUser1");
-        u1.setPassword("pass1");
-        u1.setEmail("testUser@oldMail.com");
-        userDao.addUser(u1);
-
-        int userID = userDao.getUserByUsername("TestUser1").getId();
-
-        User u2 = new User();
-        u2.setId(userID);
-        u2.setEmail("testUser@newMail.com");
-
-        userDao.mergeUser(u2);
-
-        User mergedUser = userDao.getUserById(userID);
-
-        Assertions.assertNotNull(mergedUser.getUsername());
-        Assertions.assertNotNull(mergedUser.getPassword());
-        Assertions.assertEquals("testUser@newMail.com", mergedUser.getEmail());
-        Assertions.assertEquals(userID, mergedUser.getId());
-        userDao.deleteUser(u1.getId());
-    }
+    /** For wanderers - userDao.merge(User user) was made only for changeRoleServlet to change role in db **/
 
     @Test
     void testMergeUserWithNull() {
-        Assertions.assertThrows(Exception.class, () -> userDao.mergeUser(null));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> userDao.mergeUser(null));
     }
 
     @Test
