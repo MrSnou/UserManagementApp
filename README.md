@@ -8,3 +8,13 @@
 <p>Controller side of the app is build with all types of required servlets for frontend, starting from simple helloWorldServlet (where should be the main site but the app is not about that) to authorization, login, register, edit servlets, every information which frontend needs is adapted through here for backend, and sended back in correct form.</p>
 
 <p>At the frontend we have HTML/CSS side of the aplication, so everything what user can do with the application</p>
+
+```markdown
+## 🧱 Tech Stack
+- Java 21 (Eclipse Temurin)
+- Apache Tomcat 11
+- Maven 3.9
+- MySQL 8.0
+- Hibernate ORM
+- JSP + Servlets
+- Docker & Docker Compose
